@@ -32,6 +32,7 @@ needed = [
     'pyramid_debugtoolbar',
     'pyramid_tm',
     'pyramid_jinja2',
+    'pyramid_who',
     'pyramid_beaker',
     'zope.sqlalchemy',
     'waitress',
