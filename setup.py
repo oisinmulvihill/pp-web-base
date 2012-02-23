@@ -29,8 +29,10 @@ needed = [
     'pyramid',
     'SQLAlchemy',
     'transaction',
-    'pyramid_tm',
     'pyramid_debugtoolbar',
+    'pyramid_tm',
+    'pyramid_jinja2',
+    'pyramid_beaker',
     'zope.sqlalchemy',
     'waitress',
 ]

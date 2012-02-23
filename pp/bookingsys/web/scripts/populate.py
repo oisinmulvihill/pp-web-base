@@ -1,19 +1,13 @@
 import os
 import sys
+
 import transaction
-
-from sqlalchemy import engine_from_config
-
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
     )
 
-from ..models import (
-    DBSession,
-    MyModel,
-    Base,
-    )
+from pp.common.db import dbsetup
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
@@ -27,9 +21,7 @@ def main(argv=sys.argv):
     config_uri = argv[1]
     setup_logging(config_uri)
     settings = get_appsettings(config_uri)
-    engine = engine_from_config(settings, 'sqlalchemy.')
-    DBSession.configure(bind=engine)
-    Base.metadata.create_all(engine)
+    dbsetup.setup(dbsetup.modules_from_config(settings, 'commondb.'))
+    dbsetup.init_from_config(settings, 'sqlalchemy.')
     with transaction.manager:
-        model = MyModel(name='one', value=1)
-        DBSession.add(model)
+        dbsetup.create()
