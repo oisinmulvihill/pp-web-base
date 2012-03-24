@@ -33,5 +33,5 @@ def main(global_config, **settings):
     config.scan()   
 
     app = config.make_wsgi_app()
-    return add_auth_from_config(app, config, settings, 'pp.auth.')
+    return add_auth_from_config(app, settings, 'pp.auth.')
 
