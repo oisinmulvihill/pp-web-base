@@ -23,8 +23,6 @@ Description=Summary
 ShortDescription=Summary
 
 needed = [
-    'nose',
-    'evasion-common',
     'sphinx', # for docs generation.
     'pyramid',
     'SQLAlchemy',
@@ -36,6 +34,8 @@ needed = [
     'pyramid_beaker',
     'zope.sqlalchemy',
     'waitress',
+    'pp-common-db',
+    'pp-auth',
 ]
 
 test_needed = [
