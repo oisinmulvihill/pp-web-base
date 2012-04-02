@@ -18,7 +18,7 @@ class TestMyView(unittest.TestCase):
         testing.tearDown()
 
     def test_it(self):
-        from pp.bookingsys.web.views import my_view
+        from pp.bookingsys.web.views import home
         request = testing.DummyRequest()
-        info = my_view(request)
+        info = home(request)
         # TODO: assert some results
