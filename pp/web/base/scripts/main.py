@@ -16,7 +16,7 @@ from optparse import OptionParser
 
 
 def get_log():
-    return logging.getLogger("pp.bookingsys.web.scripts.main")
+    return logging.getLogger("pp.web.base.scripts.main")
 
 
 def logtoconsolefallback(log):

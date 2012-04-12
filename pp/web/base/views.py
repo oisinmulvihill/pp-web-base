@@ -6,7 +6,7 @@ from pyramid.httpexceptions import HTTPFound, HTTPUnauthorized
 from repoze.what import predicates
 
 def get_log():
-    return logging.getLogger('pp.bookingsys.web.views')
+    return logging.getLogger('pp.web.base.views')
 
 def redirect(url):
     """Redirect user to the given URL"""
@@ -23,7 +23,7 @@ def check_predicate(request, p):
 
 @view_config(route_name='home', renderer='templates/mytemplate.pt')
 def home(request):
-    return {'project': 'pp.bookingsys.web'}
+    return {'project': 'pp.web.base'}
 
 
 

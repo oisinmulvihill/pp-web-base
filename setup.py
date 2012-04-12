@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Setuptools script for pp-bookingsys-web (pp.bookingsys.web)
+Setuptools script for pp-web-base (pp.web.base)
 
 """
 
@@ -11,13 +11,13 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
-Name='pp-bookingsys-web'
+Name='pp-web-base'
 ProjectUrl=""
 Version="1.0.dev1"
 Author=''
 AuthorEmail='everyone at pythonpro dot co dot uk'
 Maintainer=''
-Summary=' pp-bookingsys-web '
+Summary=' pp-web-base '
 License=''
 Description=Summary
 ShortDescription=Summary
@@ -30,7 +30,6 @@ needed = [
     'pyramid_debugtoolbar',
     'pyramid_tm',
     'pyramid_jinja2',
-    'pyramid_who',
     'pyramid_beaker',
     'zope.sqlalchemy',
     'waitress',
@@ -41,7 +40,7 @@ needed = [
 test_needed = [
 ]
 
-test_suite = 'pp.bookingsys.web.tests'
+test_suite = 'pp.web.base.tests'
 
 EagerResources = [
     'pp',
@@ -49,7 +48,7 @@ EagerResources = [
 
 # Example including shell script out of scripts dir
 ProjectScripts = [
-#    'pp.bookingsys.web/scripts/somescript',
+#    'pp.web.base/scripts/somescript',
 ]
 
 PackageData = {
@@ -59,9 +58,9 @@ PackageData = {
 # Example console script and paster template integration:
 EntryPoints = """
 [paste.app_factory]
-      main = pp.bookingsys.web:main
+      main = pp.web.base:main
 [console_scripts]
-      populate_web = pp.bookingsys.web.scripts.populate:main
+      populate_web = pp.web.base.scripts.populate:main
 """
 
 setup(
@@ -90,5 +89,5 @@ setup(
     package_data=PackageData,
     eager_resources = EagerResources,
     entry_points = EntryPoints,
-    namespace_packages = ['pp', 'pp.bookingsys'],
+    namespace_packages = ['pp', 'pp.web'],
 )
