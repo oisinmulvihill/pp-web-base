@@ -23,12 +23,10 @@ Description=Summary
 ShortDescription=Summary
 
 needed = [
-    'sphinx', # for docs generation.
-    'pyramid',
+    'pyramid==1.3',
     'SQLAlchemy',
     'transaction',
     'pyramid_debugtoolbar',
-    'pyramid_tm',
     'pyramid_jinja2',
     'pyramid_beaker',
     'zope.sqlalchemy',

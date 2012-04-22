@@ -1,8 +1,31 @@
+import logging
+
 from pyramid.config import Configurator
-from pyramid_beaker import session_factory_from_settings, set_cache_regions_from_settings
 
 from pp.common.db import dbsetup
 from pp.auth.middleware import add_auth_from_config
+
+def get_log():
+    return logging.getLogger('pp.web.base')
+
+
+def load_prefix_includes(config, settings):
+    """
+    Loads pyramid modules from the config much like 
+    pyramid.includes, with added support for route prefix
+    Config format is::
+        [app:main]
+        pyramid.route_includes = 
+            <module>, <prefix>
+    """
+    for line in [l for l in settings.get('pyramid.route_includes', '').split('\n') if l]:
+        mod, prefix = [i.strip() for i in line.split(',')]
+        get_log().info("Loading module %r with route prefix %r" % (mod, prefix))
+        # '/' is the same as no prefix at all, but useful to denote the  root module 
+        # in the config file
+        if prefix == '/':
+            prefix = None
+        config.include(mod, route_prefix=prefix)
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
@@ -11,26 +34,28 @@ def main(global_config, **settings):
     dbsetup.setup(dbsetup.modules_from_config(settings, 'commondb.'))
     dbsetup.init_from_config(settings, 'sqlalchemy.')
 
-    # Session handling
-    set_cache_regions_from_settings(settings)
-    session_factory = session_factory_from_settings(settings)
+    # Add some default settings (would be nicer to do this programatically)
+    settings['jinja2.filters'] = "route_url = pyramid_jinja2.filters:route_url_filter"
 
-    # TODO: not sure where get_root comes from, docs aren't clear
-    #config = Configurator(root_factory=get_root, settings=settings)
+    # Load config file - this will initiate all the includes set there
+    # from pyramid.includes
     config = Configurator(settings=settings)
 
-    config.set_session_factory(session_factory)
 
-    # Routes
-    config.add_static_view('static', 'static', cache_max_age=3600)
-    config.add_route('home', '/')
+    # Common Routes and Views
     config.add_route('login', '/login')
-    #config.add_route('login_handler', '/login_handler')
-    config.add_route('protected', '/protected')
+    config.add_route('ping', '/ping')
 
     # This scans everything under this package for view decorated methods to 
     # match up with the routes
     config.scan()   
+
+    # Load includes with route prefixes
+    load_prefix_includes(config, settings)
+
+    # Add base templates dir to the search path. This has to go last so other
+    # projects have a chance to add their templates to the search path first.
+    config.add_jinja2_search_path("%s:templates" % __name__)
 
     app = config.make_wsgi_app()
     return add_auth_from_config(app, settings, 'pp.auth.')

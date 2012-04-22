@@ -18,7 +18,7 @@ class TestMyView(unittest.TestCase):
         testing.tearDown()
 
     def test_it(self):
-        from pp.web.base.views import home
+        from pp.web.base.views import ping
         request = testing.DummyRequest()
-        info = home(request)
+        res = ping(request)
         # TODO: assert some results
