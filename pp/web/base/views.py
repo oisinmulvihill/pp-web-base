@@ -1,8 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+"""
+#import pprint
 import logging
 import datetime
-import pprint
 
 from pyramid.view import view_config
+
 
 def get_log():
     return logging.getLogger('pp.web.base.views')
@@ -23,7 +27,7 @@ def login(request):
 
     login_handler = request.registry.settings['pp.auth.login_handler_url']
     get_log().info("login handler: %r " % login_handler)
-    return dict(page='login', 
+    return dict(page='login',
                 came_from=came_from,
                 login_handler=login_handler)
 

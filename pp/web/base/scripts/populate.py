@@ -9,11 +9,13 @@ from pyramid.paster import (
 
 from pp.common.db import dbsetup
 
+
 def usage(argv):
     cmd = os.path.basename(argv[0])
     print('usage: %s <config_uri>\n'
-          '(example: "%s development.ini")' % (cmd, cmd)) 
+          '(example: "%s development.ini")' % (cmd, cmd))
     sys.exit(1)
+
 
 def main(argv=sys.argv):
     if len(argv) != 2:
