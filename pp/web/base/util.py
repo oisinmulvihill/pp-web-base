@@ -20,7 +20,7 @@ def check_predicate(request, p):
     """
     try:
         get_log().info("Checking pred %r" % p)
-        get_log().info(pprint.pformat(request.environ))
+        #get_log().info(pprint.pformat(request.environ))
         p.check_authorization(request.environ)
     except predicates.NotAuthorizedError:
         raise HTTPUnauthorized
