@@ -3,24 +3,18 @@
 Setuptools script for pp-web-base (pp.web.base)
 
 """
+from setuptools import setup, find_packages
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
-
-Name='pp-web-base'
-ProjectUrl=""
-Version="1.0.1dev"
-Author=''
-AuthorEmail='everyone at pythonpro dot co dot uk'
-Maintainer=''
-Summary=' pp-web-base '
-License=''
-Description=Summary
-ShortDescription=Summary
+Name = 'pp-web-base'
+ProjectUrl = ""
+Version = "1.0.1dev"
+Author = ''
+AuthorEmail = 'everyone at pythonpro dot co dot uk'
+Maintainer = ''
+Summary = ' pp-web-base '
+License = ''
+Description = Summary
+ShortDescription = Summary
 
 needed = [
     'pyramid==1.3',
