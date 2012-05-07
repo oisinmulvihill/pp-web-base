@@ -6,17 +6,53 @@ PythonPro Limited
 2012-01-14
 
 """
+import json
 import httplib
 import logging
 import traceback
 
 from pyramid.request import Response
 
-from pp.bookingsys.frontend.utils import status_body
-
 
 def get_log():
-    return logging.getLogger("pp.bookingsys.frontend")
+    return logging.getLogger("pp.web.base.restfulhelpers")
+
+
+def status_body(status="ok", message="", traceback="", to_json=True):
+    """Create a JSON response body we will use for error and other situations.
+
+    :param status: Default "ok" or "error".
+
+    :param message: Default "" or given string.
+
+    :param traceback: Default "" or formatted traceback string.
+
+    :param to_json: Default True, return a JSON string or dict is False.
+
+    the to_json is used in situations where something else will take care
+    of to JSON conversion.
+
+    :returns: JSON status response body.
+
+    The default response is::
+
+        json.dumps(dict(
+            status="ok",
+            message="",
+            traceback="",
+        ))
+
+    """
+    body = dict(
+        status=status,
+        message=message,
+        traceback=traceback,
+    )
+
+    if to_json:
+        body = json.dumps(body)
+
+    return body
 
 
 def notfound_404_view(request):
