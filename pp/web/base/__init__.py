@@ -29,6 +29,29 @@ def load_prefix_includes(config, settings):
         config.include(mod, route_prefix=prefix)
 
 
+def common_db_configure(settings):
+    """Configure common db using the given pyramid settings.
+
+    This will use 'commondb.' and 'sqlalchemy.' in the configuration.
+
+    :returns: None
+
+    """
+    dbsetup.setup(dbsetup.modules_from_config(settings, 'commondb.'))
+    dbsetup.init_from_config(settings, 'sqlalchemy.')
+
+
+def pp_auth_middleware(settings, app):
+    """Configure the pp auth packages using the given pyramid settings.
+
+    This will use 'pp.auth.' in the configuration.
+
+    :returns: The given app wrapped in configured pp auth middleware.
+
+    """
+    return add_auth_from_config(app, settings, 'pp.auth.')
+
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
@@ -59,4 +82,7 @@ def main(global_config, **settings):
     config.add_jinja2_search_path("%s:templates" % __name__)
 
     app = config.make_wsgi_app()
-    return add_auth_from_config(app, settings, 'pp.auth.')
+
+    app = pp_auth_middleware(app)
+
+    return app
