@@ -14,16 +14,22 @@ import traceback
 from pyramid.request import Response
 
 
-def get_log():
-    return logging.getLogger("pp.web.base.restfulhelpers")
+def get_log(extra=None):
+    m = "pp.web.base.restfulhelpers"
+    if extra:
+        if isinstance(extra, basestring):
+            m = "%s.%s" % (m, extra)
+    return logging.getLogger(m)
 
 
-def status_body(status="ok", message="", traceback="", to_json=True):
+def status_body(status="ok", message="", error="", traceback="", to_json=True):
     """Create a JSON response body we will use for error and other situations.
 
     :param status: Default "ok" or "error".
 
     :param message: Default "" or given string.
+
+    :param error: Default "" or given string like ValueError.
 
     :param traceback: Default "" or formatted traceback string.
 
@@ -46,6 +52,7 @@ def status_body(status="ok", message="", traceback="", to_json=True):
     body = dict(
         status=status,
         message=message,
+        error=error,
         traceback=traceback,
     )
 
@@ -144,6 +151,7 @@ class JSONErrorHandler(object):
     """
     def __init__(self, application):
         self.app = application
+        self.log = get_log("JSONErrorHandler")
 
     def formatError(self):
         """Return a string representing the last traceback.
@@ -161,11 +169,18 @@ class JSONErrorHandler(object):
                 httplib.responses[httplib.INTERNAL_SERVER_ERROR]
             )
             start_response(errmsg, [('Content-Type', 'application/json')])
+
+            message = str(e)
+            error = "%s" % (type(e).__name__)
+            self.log.error("%s: %s" % (error, message))
+
             return status_body(
                 status="error",
-                message="%s: %s" % (type(e).__name__, str(e)),
+                message=message,
+                error=error,
                 # Should this be disabled on production?
-                traceback=self.formatError()
+                #traceback=self.formatError()
+                traceback="self.formatError()"
             )
 
 

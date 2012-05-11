@@ -29,7 +29,7 @@ def load_prefix_includes(config, settings):
         config.include(mod, route_prefix=prefix)
 
 
-def common_db_configure(settings):
+def common_db_configure(settings, use_transaction=True):
     """Configure common db using the given pyramid settings.
 
     This will use 'commondb.' and 'sqlalchemy.' in the configuration.
@@ -38,7 +38,7 @@ def common_db_configure(settings):
 
     """
     dbsetup.setup(dbsetup.modules_from_config(settings, 'commondb.'))
-    dbsetup.init_from_config(settings, 'sqlalchemy.')
+    dbsetup.init_from_config(settings, 'sqlalchemy.', use_transaction=use_transaction)
 
 
 def pp_auth_middleware(settings, app):
