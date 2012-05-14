@@ -56,8 +56,7 @@ def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
     # Database setup
-    dbsetup.setup(dbsetup.modules_from_config(settings, 'commondb.'))
-    dbsetup.init_from_config(settings, 'sqlalchemy.')
+    common_db_configure(settings)
 
     # Add some default settings (would be nicer to do this programatically)
     settings['jinja2.filters'] = "route_url = pyramid_jinja2.filters:route_url_filter"
@@ -83,6 +82,6 @@ def main(global_config, **settings):
 
     app = config.make_wsgi_app()
 
-    app = pp_auth_middleware(app)
+    app = pp_auth_middleware(settings, app)
 
     return app
