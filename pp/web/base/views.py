@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 """
-#import pprint
 import logging
 import datetime
 
 from pyramid.view import view_config
+import pyramid.httpexceptions
+from repoze.what import predicates
+
+from util import check_predicate
 
 
 def get_log():
@@ -30,7 +33,18 @@ def login(request):
     return dict(page='login',
                 came_from=came_from,
                 login_handler=login_handler)
-
+    
+    
+@view_config(route_name='logout', renderer='login.jinja2')
+def logout(request):
+    """Log out the user."""
+    get_log().info("logout")
+    check_predicate(request, predicates.not_anonymous(msg='Must be logged in'))
+    cookie = request.environ['repoze.who.plugins']['cookie']
+    headers=cookie.forget(request.environ, None)
+    # TODO: read logout URL from config? 
+    raise pyramid.httpexceptions.HTTPFound("/", headers=headers)
+    
 
 #@view_config(route_name='login_handler', renderer='templates/login.jinja2')
 #def login_handler(request):

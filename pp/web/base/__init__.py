@@ -67,6 +67,7 @@ def main(global_config, **settings):
 
     # Common Routes and Views
     config.add_route('login', '/login')
+    config.add_route('logout', '/logout')
     config.add_route('ping', '/ping')
 
     # This scans everything under this package for view decorated methods to
