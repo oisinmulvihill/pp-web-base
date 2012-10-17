@@ -179,8 +179,8 @@ class JSONErrorHandler(object):
                 message=message,
                 error=error,
                 # Should this be disabled on production?
-                #traceback=self.formatError()
-                traceback="self.formatError()"
+                traceback=self.formatError()
+                #traceback="self.formatError()"
             )
 
 
