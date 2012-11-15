@@ -89,16 +89,23 @@ def xyz_handler(status):
         json.dumps(dict(error="URI Not Found '...'"))
 
     """
+    log = get_log()
+
     def handler(request):
         msg = str(request.exception.message)
-        get_log().info("xyz_handler (%s): %s" % (status, str(msg)))
-        request.response.status = status
-        request.response.content_type = "application/json"
+        log.info("xyz_handler (%s): %s" % (status, str(msg)))
+        #request.response.status = status
+        #request.response.content_type = "application/json"
         body = status_body(
             status="error",
             message=msg,
         )
-        return Response(body)
+
+        rc = Response(body)
+        rc.status = status
+        rc.content_type = "application/json"
+
+        return rc
 
     return handler
 
@@ -117,18 +124,21 @@ class HttpMethodOverrideMiddleware(object):
             override_method = ''
 
             # First check the "_method" form parameter
-            if 'form-urlencoded' in environ['CONTENT_TYPE']:
-                from webob import Request
-                request = Request(environ)
-                override_method = request.str_POST.get('_method', '').upper()
+            # if 'form-urlencoded' in environ['CONTENT_TYPE']:
+            #     from webob import Request
+            #     request = Request(environ)
+            #     override_method = request.str_POST.get('_method', '').upper()
 
             # If not found, then look for "X-HTTP-Method-Override" header
             if not override_method:
-                override_method = environ.get('HTTP_X_HTTP_METHOD_OVERRIDE', '').upper()
+                override_method = environ.get(
+                    'HTTP_X_HTTP_METHOD_OVERRIDE', ''
+                ).upper()
 
             if override_method in ('PUT', 'DELETE', 'OPTIONS', 'PATCH'):
                 # Save the original HTTP method
-                environ['http_method_override.original_method'] = environ['REQUEST_METHOD']
+                method = environ['REQUEST_METHOD']
+                environ['http_method_override.original_method'] = method
                 # Override HTTP method
                 environ['REQUEST_METHOD'] = override_method
 
@@ -182,6 +192,3 @@ class JSONErrorHandler(object):
                 traceback=self.formatError()
                 #traceback="self.formatError()"
             )
-
-
-
