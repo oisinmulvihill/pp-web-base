@@ -36,10 +36,16 @@ def login_required(request_handler):
     """A decorator used to require a user to be logged in before
     access a view.
 
-    @view_config(
-        route_name='survey', request_method='GET', decorator=login_required,
-        accept="text/html", renderer='home.jinja2',
-    )
+    This is used with view_config as follows::
+
+        @view_config(
+            decorator=login_required,
+            route_name='survey', request_method='GET',
+            accept="text/html", renderer='home.jinja2',
+        )
+        def something(request):
+            :
+            etc
 
     """
     log = get_log('login_required')
