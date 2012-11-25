@@ -15,10 +15,7 @@ from pyramid.request import Response
 
 
 def get_log(extra=None):
-    m = "pp.web.base.restfulhelpers"
-    if extra:
-        if isinstance(extra, basestring):
-            m = "%s.%s" % (m, extra)
+    m = "{}.{}".format(__name__, extra) if extra else __name__
     return logging.getLogger(m)
 
 
@@ -174,6 +171,7 @@ class JSONErrorHandler(object):
         try:
             return self.app(environ, start_response)
         except Exception, e:
+            self.log.exception("error: ")
             errmsg = "%d %s" % (
                 httplib.INTERNAL_SERVER_ERROR,
                 httplib.responses[httplib.INTERNAL_SERVER_ERROR]
