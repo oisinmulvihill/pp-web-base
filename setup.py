@@ -25,7 +25,7 @@ needed = [
     'pyramid_beaker',
     'zope.sqlalchemy',
     'waitress',
-    'pp-common-db',
+    'pp-db',
     'pp-auth',
 ]
 
@@ -40,7 +40,6 @@ EagerResources = [
 
 # Example including shell script out of scripts dir
 ProjectScripts = [
-#    'pp.web.base/scripts/somescript',
 ]
 
 PackageData = {
@@ -65,10 +64,10 @@ setup(
     description=ShortDescription,
     long_description=Description,
     classifiers=[
-      "Programming Language :: Python",
-      "Framework :: Pylons",
-      "Topic :: Internet :: WWW/HTTP",
-      "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        "Programming Language :: Python",
+        "Framework :: Pylons",
+        "Topic :: Internet :: WWW/HTTP",
+        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
     ],
     keywords='web wsgi bfg pylons pyramid',
     license=License,
@@ -79,7 +78,7 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     package_data=PackageData,
-    eager_resources = EagerResources,
-    entry_points = EntryPoints,
-    namespace_packages = ['pp', 'pp.web'],
+    eager_resources=EagerResources,
+    entry_points=EntryPoints,
+    namespace_packages=['pp', 'pp.web'],
 )
