@@ -2,7 +2,7 @@ import logging
 
 from pyramid.config import Configurator
 
-from pp.common.db import dbsetup
+from pp.db import dbsetup
 from pp.auth.middleware import add_auth_from_config
 
 

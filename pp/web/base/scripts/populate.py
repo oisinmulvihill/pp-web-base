@@ -5,9 +5,9 @@ import transaction
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
-    )
+)
 
-from pp.common.db import dbsetup
+from pp.db import dbsetup
 
 
 def usage(argv):
