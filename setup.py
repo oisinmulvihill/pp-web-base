@@ -1,84 +1,30 @@
-# -*- coding: utf-8 -*-
-"""
-Setuptools script for pp-web-base (pp.web.base)
+# $HeadURL$
+try:
+    from pkglib.setuptools import setup
+except ImportError:
+    print "PkgLib is not available. Please run \"easy_install pkglib\""
+    import sys
+    sys.exit(1)
 
-"""
-from setuptools import setup, find_packages
+# ------------------ Define your C-extensions here --------------------- #
 
-Name = 'pp-web-base'
-ProjectUrl = ""
-Version = "1.0.1dev"
-Author = ''
-AuthorEmail = 'everyone at pythonpro dot co dot uk'
-Maintainer = ''
-Summary = ' pp-web-base '
-License = ''
-Description = Summary
-ShortDescription = Summary
+# Conventions:
+# Source code under '<package root>/src/'
+# Extension modules names begin with an underscore: eg, '_xyz'
+# to differentiate them from regular Python modules.
 
-needed = [
-    'pyramid==1.3',
-    'SQLAlchemy',
-    'transaction',
-    'pyramid_debugtoolbar',
-    'pyramid_jinja2',
-    'pyramid_beaker',
-    'zope.sqlalchemy',
-    'waitress',
-    'pp-db',
-    'pp-auth',
-]
+# import numpy
+# extra_compile_args = ['-O0']
 
-test_needed = [
-]
+# setup( ext_modules = [
+#        Extension('acme.mypackage._foo', ['src/foo1.c', 'src/foo2.c']  \
+#                   include_dirs=[ numpy.get_include() ],
+#                   extra_compile_args=extra_compile_args,
+#        ),
+#        Extension('acme.mypackage._bar', ['src/bar1.c', 'src/bar2.c']  \
+#                   include_dirs=[ numpy.get_include() ],
+#                   extra_compile_args=extra_compile_args,
+#       ),
+# ])
 
-test_suite = 'pp.web.base.tests'
-
-EagerResources = [
-    'pp',
-]
-
-# Example including shell script out of scripts dir
-ProjectScripts = [
-]
-
-PackageData = {
-    '': ['*.*'],
-}
-
-# Example console script and paster template integration:
-EntryPoints = """
-[paste.app_factory]
-      main = pp.web.base:main
-[console_scripts]
-      populate_web = pp.web.base.scripts.populate:main
-"""
-
-setup(
-    url=ProjectUrl,
-    name=Name,
-    zip_safe=False,
-    version=Version,
-    author=Author,
-    author_email=AuthorEmail,
-    description=ShortDescription,
-    long_description=Description,
-    classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pylons",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-    ],
-    keywords='web wsgi bfg pylons pyramid',
-    license=License,
-    scripts=ProjectScripts,
-    install_requires=needed,
-    tests_require=test_needed,
-    test_suite=test_suite,
-    include_package_data=True,
-    packages=find_packages(),
-    package_data=PackageData,
-    eager_resources=EagerResources,
-    entry_points=EntryPoints,
-    namespace_packages=['pp', 'pp.web'],
-)
+setup(entry_points={'paste.app_factory': 'main = pp.web.base:main'})
