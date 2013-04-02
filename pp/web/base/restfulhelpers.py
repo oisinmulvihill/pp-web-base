@@ -59,6 +59,10 @@ def status_body(status="ok", message="", error="", traceback="", to_json=True):
     return body
 
 
+def status_err(exc, tb):
+    return status_body("error", str(exc), exc.__class__.__name__, to_json=False)
+
+
 def notfound_404_view(request):
     """A custom 404 view returning JSON error message body instead of HTML.
 
