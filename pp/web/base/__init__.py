@@ -1,6 +1,8 @@
 import logging
+import datetime
 
 from pyramid.config import Configurator
+from pyramid.renderers import JSON
 
 from pp.db import dbsetup
 from pp.auth.middleware import add_auth_from_config
@@ -52,6 +54,17 @@ def pp_auth_middleware(settings, app):
     return add_auth_from_config(app, settings, 'pp.auth.')
 
 
+def setup_json_adapters(config):
+    """ Setup json rendering for some standard types
+    """
+    def datetime_adapter(obj, request):
+        return obj.isoformat()
+
+    json_renderer = JSON()
+    json_renderer.add_adapter(datetime.datetime, datetime_adapter)
+    config.add_renderer('json', json_renderer)
+
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
@@ -64,6 +77,9 @@ def main(global_config, **settings):
     # Load config file - this will initiate all the includes set there
     # from pyramid.includes
     config = Configurator(settings=settings)
+
+    # Setup json adapters
+    setup_json_adapters(config)
 
     # Common Routes and Views
     config.add_route('login', '/login')

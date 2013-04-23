@@ -46,6 +46,7 @@ def status_body(status="ok", message="", error="", traceback="", to_json=True):
         ))
 
     """
+    # TODO: switch tracebacks off for production
     body = dict(
         status=status,
         message=message,
@@ -57,6 +58,10 @@ def status_body(status="ok", message="", error="", traceback="", to_json=True):
         body = json.dumps(body)
 
     return body
+
+
+def status_err(exc, tb):
+    return status_body("error", str(exc), exc.__class__.__name__, tb, to_json=False)
 
 
 def notfound_404_view(request):
