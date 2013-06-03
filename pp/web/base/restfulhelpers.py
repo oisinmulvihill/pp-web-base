@@ -12,6 +12,7 @@ import logging
 import traceback
 
 from pyramid.request import Response
+from decorator import decorator
 
 
 def get_log(extra=None):
@@ -61,7 +62,24 @@ def status_body(status="ok", message="", error="", traceback="", to_json=True):
 
 
 def status_err(exc, tb):
-    return status_body("error", str(exc), exc.__class__.__name__, tb, to_json=False)
+    """ Generate an error status response from an exception and traceback
+    """
+    return status_body("error", str(exc), exc.__class__.__name__, tb,
+                       to_json=False)
+
+
+@decorator
+def status_wrapper(f, *args, **kw):
+    """ Decorate a view function to wrap up its response in the status_body
+        gumph from above, and handle all exceptions.
+    """
+    try:
+        res = f(*args, **kw)
+        return status_body(message=res, to_json=False)
+    except Exception, e:
+        tb = traceback.format_exc()
+        get_log().exception(tb)
+        return status_err(e, tb)
 
 
 def notfound_404_view(request):
@@ -96,8 +114,8 @@ def xyz_handler(status):
     def handler(request):
         msg = str(request.exception.message)
         log.info("xyz_handler (%s): %s" % (status, str(msg)))
-        #request.response.status = status
-        #request.response.content_type = "application/json"
+        # request.response.status = status
+        # request.response.content_type = "application/json"
         body = status_body(
             status="error",
             message=msg,
@@ -193,5 +211,5 @@ class JSONErrorHandler(object):
                 error=error,
                 # Should this be disabled on production?
                 traceback=self.formatError()
-                #traceback="self.formatError()"
+                # traceback="self.formatError()"
             )
