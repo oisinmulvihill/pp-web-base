@@ -1,11 +1,13 @@
 import logging
 import datetime
+import pprint
 
 from pyramid.config import Configurator
 from pyramid.renderers import JSON
 
 from pp.db import dbsetup
 from pp.auth.middleware import add_auth_from_config
+from pp.utils.json_ import CustomEncoder, get_adapters
 
 
 def get_log():
@@ -55,13 +57,17 @@ def pp_auth_middleware(settings, app):
 
 
 def setup_json_adapters(config):
-    """ Setup json rendering for some standard types
+    """ Setup json rendering using our custom encoder
     """
-    def datetime_adapter(obj, request):
-        return obj.isoformat()
+    # Extract adapters from our common global json adapters, curry them to
+    # include the request object
+    adapters = []
+    for type_, fn in get_adapters():
+        def new_fn(obj, request):
+            return fn(obj)
+        adapters.append((type_, new_fn))
 
-    json_renderer = JSON()
-    json_renderer.add_adapter(datetime.datetime, datetime_adapter)
+    json_renderer = JSON(cls=CustomEncoder, adapters=adapters)
     config.add_renderer('json', json_renderer)
 
 
