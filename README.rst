@@ -1,5 +1,5 @@
-{{project}}
-===================================
+pp-web-base
+===========
 
 .. contents::
 
@@ -7,13 +7,13 @@
 Introduction
 ------------
 
-This provides the namespaced package: {{namespaced_package}}
+This provides the namespaced package: pp.web.base
 
 
 Testing
 -------
 
-Activate the dev environment and change into {{project}}.
+Activate the dev environment and change into pp-web-base.
 
 Run all tests
 ~~~~~~~~~~~~~
