@@ -15,21 +15,46 @@ from pyramid.request import Response
 from decorator import decorator
 
 
-def get_log(extra=None):
-    m = "{}.{}".format(__name__, extra) if extra else __name__
-    return logging.getLogger(m)
+def get_log(e=None):
+    return logging.getLogger("{0}.{1}".format(__name__, e) if e else __name__)
 
 
-def status_body(status="ok", message="", error="", traceback="", to_json=True):
+def json_result(view_callable):
+    """Return a result dict for a response.
+
+      rc = {
+          "success": True | False,
+          "data": ...,
+          "message", "ok" | "..message explaining result=False..",
+      }
+
+    the data field will contain whatever is returned from the response
+    normal i.e. any valid type.
+
+    """
+    #log = get_log('json_result')
+
+    def inner(request, *args):
+        """Add the success status wrapper. exceptions will be
+        handled elsewhere.
+        """
+        response = dict(success=True, data=None, message="ok")
+        response['data'] = view_callable(request, *args)
+        return response
+
+    return inner
+
+
+def status_body(
+    success=True, data=None, message="", to_json=False, traceback='',
+):
     """Create a JSON response body we will use for error and other situations.
 
-    :param status: Default "ok" or "error".
+    :param success: Default True or False.
 
-    :param message: Default "" or given string.
+    :param data: Default "" or given result.
 
-    :param error: Default "" or given string like ValueError.
-
-    :param traceback: Default "" or formatted traceback string.
+    :param message: Default "ok" or a user given message string.
 
     :param to_json: Default True, return a JSON string or dict is False.
 
@@ -41,19 +66,21 @@ def status_body(status="ok", message="", error="", traceback="", to_json=True):
     The default response is::
 
         json.dumps(dict(
-            status="ok",
-            message="",
-            traceback="",
+            success=True | False,
+            data=...,
+            message="...",
         ))
 
     """
     # TODO: switch tracebacks off for production
     body = dict(
-        status=status,
+        success=success,
+        data=data,
         message=message,
-        error=error,
-        traceback=traceback,
     )
+
+    if traceback:
+        body['traceback'] = traceback
 
     if to_json:
         body = json.dumps(body)
@@ -95,7 +122,7 @@ def notfound_404_view(request):
     request.response.status = httplib.NOT_FOUND
     request.response.content_type = "application/json"
     body = status_body(
-        status="error",
+        success=False,
         message="URI Not Found '%s'" % msg,
     )
     return Response(body)
@@ -114,11 +141,12 @@ def xyz_handler(status):
     def handler(request):
         msg = str(request.exception.message)
         log.info("xyz_handler (%s): %s" % (status, str(msg)))
-        # request.response.status = status
-        # request.response.content_type = "application/json"
+        #request.response.status = status
+        #request.response.content_type = "application/json"
         body = status_body(
-            status="error",
+            success=False,
             message=msg,
+            to_json=True,
         )
 
         rc = Response(body)
@@ -172,11 +200,14 @@ class JSONErrorHandler(object):
 
     E.g.::
 
-        status_body(
-            status="error",
-            message=exception string,
-            traceback="long form of the traceback."
-        )
+        rc = {
+            "success": True | False,
+            "data": ...,
+            "message", "ok" | "..message explaining result=False..",
+        }
+
+    the data field will contain whatever is returned from the response
+    normal i.e. any valid type.
 
     """
     def __init__(self, application):
@@ -206,10 +237,11 @@ class JSONErrorHandler(object):
             self.log.error("%s: %s" % (error, message))
 
             return status_body(
-                status="error",
-                message=message,
-                error=error,
+                success=False,
                 # Should this be disabled on production?
-                traceback=self.formatError()
-                # traceback="self.formatError()"
+                data=self.formatError(),
+                message=message,
+                # I need to JSON encode it as the view never finished and the
+                # requestor is expecting a JSON response status.
+                to_json=True,
             )
