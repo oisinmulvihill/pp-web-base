@@ -1,17 +1,14 @@
 import logging
-import datetime
-import pprint
 
 from pyramid.config import Configurator
 from pyramid.renderers import JSON
-
 from pp.db import dbsetup
 from pp.auth.middleware import add_auth_from_config
 from pp.utils.json_ import CustomEncoder, get_adapters
 
 
-def get_log():
-    return logging.getLogger('pp.web.base')
+def get_log(e=None):
+    return logging.getLogger("{0}.{1}".format(__name__, e) if e else __name__)
 
 
 def load_prefix_includes(config, settings):
@@ -23,11 +20,16 @@ def load_prefix_includes(config, settings):
         pyramid.route_includes =
             <module>, <prefix>
     """
-    for line in [l for l in settings.get('pyramid.route_includes', '').split('\n') if l]:
+    lines = [
+        l for l in settings.get('pyramid.route_includes', '').split('\n') if l
+    ]
+    for line in lines:
         mod, prefix = [i.strip() for i in line.split(',')]
-        get_log().info("Loading module %r with route prefix %r" % (mod, prefix))
-        # '/' is the same as no prefix at all, but useful to denote the  root module
-        # in the config file
+        get_log().info(
+            "Loading module %r with route prefix %r" % (mod, prefix)
+        )
+        # '/' is the same as no prefix at all, but useful to denote the root
+        # module in the config file
         if prefix == '/':
             prefix = None
         config.include(mod, route_prefix=prefix)
@@ -42,7 +44,9 @@ def common_db_configure(settings, use_transaction=True):
 
     """
     dbsetup.setup(dbsetup.modules_from_config(settings, 'commondb.'))
-    dbsetup.init_from_config(settings, 'sqlalchemy.', use_transaction=use_transaction)
+    dbsetup.init_from_config(
+        settings, 'sqlalchemy.', use_transaction=use_transaction
+    )
 
 
 def pp_auth_middleware(settings, app):
@@ -54,6 +58,41 @@ def pp_auth_middleware(settings, app):
 
     """
     return add_auth_from_config(app, settings, 'pp.auth.')
+
+
+def pp_api_access_token_middleware(settings, app):
+    """Set up API Access token authentication.
+
+    :param settings:
+
+    :param app:
+
+    """
+    log = get_log('pp_api_access_token_middleware')
+
+    from pp.user.client import rest
+    from pp.apiaccesstoken.middleware import ValidateAccessToken
+
+    uri = settings.get('pp.user.uri')
+    if not uri:
+        raise ValueError(
+            "pp.user.uri is not set in the configuration!"
+        )
+
+    user_svc = rest.UserService(uri)
+    secret_for_access_token = user_svc.user.secret_for_access_token
+
+    def recover_secret(access_token):
+        """This needs to recover the access_secret for the given access_token.
+
+        :returns: The access_secret or None if nothing was found.
+
+        """
+        return secret_for_access_token(access_token)
+
+    log.info("API token lookup initialised and ready to roll.")
+
+    return ValidateAccessToken(app, recover_secret=recover_secret)
 
 
 def setup_json_adapters(config):
@@ -78,7 +117,8 @@ def main(global_config, **settings):
     common_db_configure(settings)
 
     # Add some default settings (would be nicer to do this programatically)
-    settings['jinja2.filters'] = "route_url = pyramid_jinja2.filters:route_url_filter"
+    f = "route_url = pyramid_jinja2.filters:route_url_filter"
+    settings['jinja2.filters'] = f
 
     # Load config file - this will initiate all the includes set there
     # from pyramid.includes
@@ -106,5 +146,7 @@ def main(global_config, **settings):
     app = config.make_wsgi_app()
 
     app = pp_auth_middleware(settings, app)
+
+    app = pp_api_access_token_middleware(settings, app)
 
     return app
