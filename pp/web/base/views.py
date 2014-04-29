@@ -42,7 +42,7 @@ def logout(request):
     check_predicate(request, predicates.not_anonymous(msg='Must be logged in'))
     cookie = request.environ['repoze.who.plugins']['cookie']
     headers = cookie.forget(request.environ, None)
-    # TODO: read logout URL from config? 
+    # TODO: read logout URL from config?
     raise pyramid.httpexceptions.HTTPFound("/", headers=headers)
 
 
