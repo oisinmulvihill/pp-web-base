@@ -15,11 +15,6 @@ def get_log():
     return logging.getLogger('pp.web.base.views')
 
 
-@view_config(route_name='ping', renderer='ping.jinja2')
-def ping(request):
-    return {'ping': datetime.datetime.now()}
-
-
 @view_config(route_name='login', renderer='login.jinja2')
 def login(request):
     """Start the user login."""
