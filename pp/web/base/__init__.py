@@ -43,10 +43,16 @@ def common_db_configure(settings, use_transaction=True):
     :returns: None
 
     """
-    dbsetup.setup(dbsetup.modules_from_config(settings, 'commondb.'))
-    dbsetup.init_from_config(
-        settings, 'sqlalchemy.', use_transaction=use_transaction
-    )
+    if 'sqlalchemy' not in settings:
+        get_log().warn(
+            "common_db_configure: sqlalchemy not present disabling."
+        )
+
+    else:
+        dbsetup.setup(dbsetup.modules_from_config(settings, 'commondb.'))
+        dbsetup.init_from_config(
+            settings, 'sqlalchemy.', use_transaction=use_transaction
+        )
 
 
 def pp_auth_middleware(settings, app):
