@@ -70,7 +70,15 @@ def pp_api_access_token_middleware(settings, app):
     """
     log = get_log('pp_api_access_token_middleware')
 
-    from pp.user.client import rest
+    try:
+        from pp.user.client import rest
+
+    except ImportError:
+        log.warn(
+            'pp-user-client not found. Disabling api access token middleware.'
+        )
+        return app
+
     from pp.apiaccesstoken.middleware import ValidateAccessToken
 
     uri = settings.get('pp.user.uri')
