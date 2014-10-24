@@ -58,11 +58,11 @@ def login_required(request_handler):
 
         except predicates.NotAuthorizedError:
             log.debug("login required.")
-            redirect('/login')
+            redirect('/login?came_from={}'.format(request.path))
 
         else:
             log.debug("logged in.")
 
-        return request_handler(context, request)
+        return request_handler(request)
 
     return _fn

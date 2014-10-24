@@ -10,8 +10,8 @@ from repoze.what import predicates
 from util import check_predicate
 
 
-def get_log():
-    return logging.getLogger('pp.web.base.views')
+def get_log(e=None):
+    return logging.getLogger("{0}.{1}".format(__name__, e) if e else __name__)
 
 
 @view_config(route_name='login', renderer='login.jinja2')
