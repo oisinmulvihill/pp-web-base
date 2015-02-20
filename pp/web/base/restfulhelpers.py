@@ -224,24 +224,29 @@ class JSONErrorHandler(object):
     def __call__(self, environ, start_response):
         try:
             return self.app(environ, start_response)
+
         except Exception, e:
             self.log.exception("error: ")
-            errmsg = "%d %s" % (
-                httplib.INTERNAL_SERVER_ERROR,
-                httplib.responses[httplib.INTERNAL_SERVER_ERROR]
-            )
-            start_response(errmsg, [('Content-Type', 'application/json')])
+            ctype = environ.get('CONTENT_TYPE')
+            if ctype == "application/json":
+                self.log.debug("Request was in JSON responding with JSON.")
+                errmsg = "%d %s" % (
+                    httplib.INTERNAL_SERVER_ERROR,
+                    httplib.responses[httplib.INTERNAL_SERVER_ERROR]
+                )
+                start_response(errmsg, [('Content-Type', 'application/json')])
+                message = str(e)
+                error = "%s" % (type(e).__name__)
+                self.log.error("%s: %s" % (error, message))
+                return status_body(
+                    success=False,
+                    # Should this be disabled on production?
+                    data=self.formatError(),
+                    message=message,
+                    # I need to JSON encode it as the view never finished and
+                    # the requestor is expecting a JSON response status.
+                    to_json=True,
+                )
 
-            message = str(e)
-            error = "%s" % (type(e).__name__)
-            self.log.error("%s: %s" % (error, message))
-
-            return status_body(
-                success=False,
-                # Should this be disabled on production?
-                data=self.formatError(),
-                message=message,
-                # I need to JSON encode it as the view never finished and the
-                # requestor is expecting a JSON response status.
-                to_json=True,
-            )
+            else:
+                raise
